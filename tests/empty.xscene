@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<scene name="Main_map" version="2">
+  <flora_bounding_rect min="0.000, 0.000" max="0.000, 0.000" />
+  <levels>
+    <level name="base" mask="1" />
+    <level name="level_1" mask="2" />
+    <level name="level_2" mask="4" />
+    <level name="level_3" mask="8" />
+    <level name="civilian" mask="16" />
+    <level name="siege" mask="32" />
+    <level name="looted" mask="64" />
+  </levels>
+  <environment_properties>
+    <property name="nav_mesh_auto_generated_" value="true" />
+    <property name="physics_world_min" value="-973.117, -936.996" />
+    <property name="physics_world_max_" value="848.000, 848.000" />
+    <property name="north_angle" value="0.000" />
+    <property name="is_indoors" value="false" />
+    <property name="disable_flora_billboards" value="false" />
+    <property name="ground_color" value="0.000, 0.000, 0.000" />
+    <property name="prt_multiplier" value="1.000" />
+    <property name="prt_point_light_multiplier" value="1.000" />
+    <property name="fog_start_distance" value="50.000" />
+    <property name="prt_color_contrast" value="1.000" />
+    <property name="scene_scale_multiplier" value="1.000" />
+    <property name="prt_intensity_contrast" value="1.000" />
+    <property name="prt_fallback_probe_index" value="-1, -1, -1" />
+    <property name="enforced_color_grade" value="" />
+    <atmosphere_properties>
+      <property name="atmosphere_name" value="scene_atmosphere" />
+      <property name="wind" value="0.000, 2.000" />
+      <property name="scene_fog_falloff_offset" value="0.000" />
+    </atmosphere_properties>
+    <water_properties version="1">
+      <property name="water_level" value="1.800" />
+      <property name="water_strength" value="5.000" />
+      <property name="water_wind_dependency" value="1.000" />
+      <property name="water_material" value="wat_main_map_ocean_g" />
+      <property name="water_shallow_color" value="0.006, 0.013, 0.006" />
+      <property name="water_deep_color" value="0.000, 0.007, 0.017" />
+      <property name="water_exists" value="true" />
+      <property name="place_water_probe" value="true" />
+    </water_properties>
+    <out_of_bounds_effects_properties>
+      <property name="vignette_color" value="0.000, 0.500, 1.000" />
+      <property name="vignette_alpha" value="0.000" />
+    </out_of_bounds_effects_properties>
+  </environment_properties>
+  <entities>
+  </entities>
+</scene>
