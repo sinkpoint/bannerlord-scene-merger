@@ -13,6 +13,12 @@
             <game_entity name="castle_village_ADD_IC2" old_prefab_name="map_village_emp_all_40" mobility="1"></game_entity>
         </children>
     </game_entity>
+    <game_entity name="campaign_icon_capsule_new" old_prefab_name="">
+        <transform position="10, 10, 0" rotation_euler="0.000, 0.000, 0.000"/>
+        <children>
+            <game_entity name="castle_village_ADD_in_cap" old_prefab_name="map_village_emp_all_40" mobility="1"></game_entity>
+        </children>
+    </game_entity>    
     <game_entity name="castle_village_ES2_2" old_prefab_name="map_village_emp_all_40" mobility="1" insert="true">
         <transform position="100, 0, 0" rotation_euler="0.000, 0.000, 0.000"/>
     </game_entity>            

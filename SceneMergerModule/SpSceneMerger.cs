@@ -118,7 +118,7 @@ namespace SpSceneMerger
     public class Merger
     {
 
-        public static void  doMergeDifference(XmlNodeList xl1, XmlNodeList xl2, String xpathroot, ref XmlDocument xdoc1)
+        public static void  doMergeDifference(XmlNodeList xl1, XmlNodeList xl2, String xpathroot, ref XmlDocument xdoc1, bool ig_ic=true)
         {
             Console.WriteLine("-- xl1 has {0} elements", xl1.Count);
             Console.WriteLine("-- xl2 has {0} elements", xl2.Count);
@@ -142,7 +142,7 @@ namespace SpSceneMerger
             {
                 String nodename = i.Attributes["name"].Value;
                 Console.WriteLine("xl2 elt {0}", nodename);
-                if (nodename.StartsWith("campaign_icon_capsule"))
+                if (ig_ic && nodename.StartsWith("campaign_icon_capsule"))
                 {
                     continue;
                 }
@@ -303,7 +303,7 @@ namespace SpSceneMerger
             // -------------------- merge each capsule -------------------------------
             Console.WriteLine("------------ IC -----------");
 
-            doMergeDifference(xl1_ic, xl2_ic, "/scene/entities", ref xdoc1);
+            doMergeDifference(xl1_ic, xl2_ic, "/scene/entities", ref xdoc1, false);
 
             IDictionary<String, XmlNode> icMap = new Dictionary<String, XmlNode>();
             foreach (XmlNode i in xl1_ic)
