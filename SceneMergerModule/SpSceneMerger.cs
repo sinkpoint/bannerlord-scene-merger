@@ -67,7 +67,7 @@ namespace SpSceneMerger
             String msg = "";
 
             XmlDocument xdocbase = null;
-
+            int mod_idx = 0;
             foreach (var modpath in mod_paths)
             {
                 String fullscenepath = modpath.Replace("$BASE/", basepath) + scenepath;
@@ -77,11 +77,12 @@ namespace SpSceneMerger
 
                 if (File.Exists(fullscenepath))
                 {
+                    string mod_name = modpath.Split('/')[2];
                     // do merge
                     msg = "found main scene " + fullscenepath;
                     Console.WriteLine(msg);
                     MBDebug.ConsolePrint(msg);
-                    InformationManager.DisplayMessage(new InformationMessage("found map for "+modpath.Split('/')[2]));
+                    InformationManager.DisplayMessage(new InformationMessage("found map for "+ mod_name));
 
                     if (xdocbase == null)
                     {
@@ -92,9 +93,10 @@ namespace SpSceneMerger
                     {
                         XmlDocument xdocnew = new XmlDocument();
                         xdocnew.Load(fullscenepath);
-                        xdocbase = Merger.MyXmlMerge(xdocbase, xdocnew);
+                        xdocbase = Merger.MyXmlMerge(xdocbase, xdocnew, false, true, mod_idx.ToString());
                     }
                 }
+                mod_idx++;
             }
 
             String mypath = Utilities.GetFullModulePath("SpSceneMerger").Replace("$BASE/", basepath);
@@ -117,7 +119,7 @@ namespace SpSceneMerger
 
     public class Merger
     {
-
+        const int CAPSULE_MAX_NUM = 97;
         public static void  doMergeDifference(XmlNodeList xl1, XmlNodeList xl2, String xpathroot, ref XmlDocument xdoc1, bool ig_ic=true)
         {
             Console.WriteLine("-- xl1 has {0} elements", xl1.Count);
@@ -186,14 +188,42 @@ namespace SpSceneMerger
             }
         }
 
-        public static XmlDocument MyXmlMerge(XmlDocument xdoc1, XmlDocument xdoc2)
+        public static XmlDocument MyXmlMerge(XmlDocument xdoc1, XmlDocument xdoc2, bool only_capsule = false, bool only_towns = false, String cap_num_prefix = "")
         {
-            XmlNodeList xl1 = xdoc1.SelectNodes("/scene/entities/game_entity[not(starts-with(@name, 'campaign_icon_capsule'))]");
-            XmlNodeList xl1_ic = xdoc1.SelectNodes("/scene/entities/game_entity[starts-with(@name, 'campaign_icon_capsule')]");
+            String query1 = "/scene/entities/game_entity[not(starts-with(@name, 'campaign_icon_capsule'))]";
+            if (only_towns)
+            { 
+                query1 = "/scene/entities/game_entity/scripts/script[starts-with(@name,'Town Entity Manager')]";
+            }
+            String query2 = "/scene/entities/game_entity[starts-with(@name, 'campaign_icon_capsule')]";
+            XmlNodeList xl1 = xdoc1.SelectNodes(query1);
+            XmlNodeList xl1_ic = xdoc1.SelectNodes(query2);
             XmlNodeList xl1_ic_children = xdoc1.SelectNodes("/scene/entities/game_entity[starts-with(@name, 'campaign_icon_capsule')]/children//game_entity");
 
-            XmlNodeList xl2 = xdoc2.SelectNodes("/scene/entities/game_entity[not(starts-with(@name, 'campaign_icon_capsule'))]");
-            XmlNodeList xl2_ic = xdoc2.SelectNodes("/scene/entities/game_entity[starts-with(@name, 'campaign_icon_capsule')]");
+            XmlNodeList xl2 = xdoc2.SelectNodes(query1);
+            XmlNodeList xl2_ic = xdoc2.SelectNodes(query2);
+
+            foreach (XmlNode i in xl2_ic)
+            {
+                String node_name = i.Attributes["name"].Value;
+                Console.WriteLine(node_name);
+                string[] tokens = node_name.Split('_');
+                Console.WriteLine(tokens[3]);
+                try
+                {
+                    if (int.Parse(tokens[3]) > CAPSULE_MAX_NUM)
+                    {
+                        tokens[3] = cap_num_prefix + tokens[3];
+                        node_name = String.Join("_", tokens);
+                        Console.WriteLine(node_name);
+                        i.Attributes["name"].Value = node_name;
+                    }
+                }
+                catch (System.FormatException)
+                {
+                    // pass
+                }
+            }
             //XmlNodeList xl2_ic_children = xdoc2.SelectNodes("/scene/entities/game_entity[starts-with(@name, 'campaign_icon_capsule')]/children//game_entity");
 
             Console.WriteLine("doc1 has {0} elements", xl1.Count);
@@ -208,81 +238,89 @@ namespace SpSceneMerger
 
             // node name in new file can be non-unique, manual lookup needed
 
-            HashSet<String> nameMap = new HashSet<string>();
-            IDictionary<String, XmlNode> icnameMap = new Dictionary<string, XmlNode>();
-
-            foreach (XmlNode i in xl1)
+            if (!only_capsule)
             {
-                if (i.Attributes != null && i.Attributes["name"] != null)
-                {
-                    nameMap.Add(i.Attributes["name"].Value);
-                }
-            }
 
-            foreach (XmlNode i in xl1_ic_children)
-            {
-                if (i.Attributes != null && i.Attributes["name"] != null)
-                {
-                    icnameMap[i.Attributes["name"].Value] = i;
-                    Console.WriteLine("ic1 {0}",i.Attributes["name"].Value);
-                }
-            }
+                HashSet<String> nameMap = new HashSet<string>();
+                IDictionary<String, XmlNode> icnameMap = new Dictionary<string, XmlNode>();
 
-            String[] exclude = new String[] { "empty_object", "editor_cube", "", "_decal" };
-            // add unique base-level elements,
-            ArrayList queue = new ArrayList();
-            foreach( XmlNode i in xl2 )
-            {
-                //if (nodename.StartsWith("campaign_icon_capsule")) {
-                //    continue;
-                //}
-
-                if (i.Attributes != null && i.Attributes["name"] != null)
+                foreach (XmlNode k in xl1)
                 {
-                    String nodename = i.Attributes["name"].Value;
-                    if ( ! (nameMap.Contains(nodename) || icnameMap.ContainsKey(nodename)) ) 
+                    XmlNode i = k.ParentNode.ParentNode;
+                    if (i.Attributes != null && i.Attributes["name"] != null)
                     {
-                        queue.Add(i);
+                        nameMap.Add(i.Attributes["name"].Value);
                     }
-                    else if (icnameMap.ContainsKey(nodename))
+                }
+
+                foreach (XmlNode i in xl1_ic_children)
+                {
+                    if (i.Attributes != null && i.Attributes["name"] != null)
                     {
-                        if (!exclude.Any(s => s.Equals(nodename))) {
+                        icnameMap[i.Attributes["name"].Value] = i;
+                        Console.WriteLine("ic1 {0}", i.Attributes["name"].Value);
+                    }
+                }
 
-                            // overwrite into the ic
-                            Console.WriteLine("ic contains {0}", nodename);
-                            XmlNode imnode = icnameMap[nodename];
-                            if (imnode.ParentNode == null)
-                                continue;
+                String[] exclude = new String[] { "empty_object", "editor_cube", "", "_decal" };
+                // add unique base-level elements,
+                ArrayList queue = new ArrayList();
+                foreach (XmlNode k in xl2)
+                {
+                    XmlNode i = k.ParentNode.ParentNode;
+                    //if (nodename.StartsWith("campaign_icon_capsule")) {
+                    //    continue;
+                    //}
 
-                            XmlNode icparent = imnode.ParentNode;
-                            XmlNode icroot = icparent.ParentNode;
-                            XmlNode parentTransform = icroot.SelectSingleNode("./transform");
-                            Vec3 parentpos = Vec3.Parse(parentTransform.Attributes["position"].Value);
-                            XmlNode localTransform = i.SelectSingleNode("./transform");
-                            Vec3 localpos = Vec3.Parse(localTransform.Attributes["position"].Value);
-                            Console.WriteLine("old pos: {0}", localpos.ToString());
-                            Vec3 newpos = localpos - parentpos;
-                            localTransform.Attributes["position"].Value = $"{newpos.X}, {newpos.Y}, {newpos.Z}";
-                            Console.WriteLine("new pos: {0}",localTransform.Attributes["position"].Value);
-                            XmlNode j = xdoc1.ImportNode(i, true);
-                            icparent.ReplaceChild(j, icnameMap[nodename]);
+                    if (i.Attributes != null && i.Attributes["name"] != null)
+                    {
+                        String nodename = i.Attributes["name"].Value;
+                        if (!(nameMap.Contains(nodename) || icnameMap.ContainsKey(nodename)))
+                        {
+                            queue.Add(i);
+                        }
+                        else if (icnameMap.ContainsKey(nodename))
+                        {
+                            if (!exclude.Any(s => s.Equals(nodename)))
+                            {
+
+                                // overwrite into the ic
+                                Console.WriteLine("ic contains {0}", nodename);
+                                XmlNode imnode = icnameMap[nodename];
+                                if (imnode.ParentNode == null)
+                                    continue;
+
+                                XmlNode icparent = imnode.ParentNode;
+                                XmlNode icroot = icparent.ParentNode;
+                                XmlNode parentTransform = icroot.SelectSingleNode("./transform");
+                                Vec3 parentpos = Vec3.Parse(parentTransform.Attributes["position"].Value);
+                                XmlNode localTransform = i.SelectSingleNode("./transform");
+                                Vec3 localpos = Vec3.Parse(localTransform.Attributes["position"].Value);
+                                Console.WriteLine("old pos: {0}", localpos.ToString());
+                                Vec3 newpos = localpos - parentpos;
+                                localTransform.Attributes["position"].Value = $"{newpos.X}, {newpos.Y}, {newpos.Z}";
+                                Console.WriteLine("new pos: {0}", localTransform.Attributes["position"].Value);
+                                XmlNode j = xdoc1.ImportNode(i, true);
+                                icparent.ReplaceChild(j, icnameMap[nodename]);
+                            }
                         }
                     }
                 }
+
+                XmlNode ent = xdoc1.SelectSingleNode("/scene/entities");
+
+                foreach (XmlNode i in queue)
+                {
+                    Console.WriteLine(i.Attributes["name"].Value);
+                    XmlNode j = xdoc1.ImportNode(i, true);
+                    ent.AppendChild(j);
+                }
+
+                // find nodes in doc2 that overlaps with doc1, and merge them in
+
+                doMergeOverlap(xl1, xl2, "/scene/entities", ref xdoc1);
+
             }
-
-            XmlNode ent = xdoc1.SelectSingleNode("/scene/entities");
-
-            foreach (XmlNode i in queue)
-            {
-                Console.WriteLine(i.Attributes["name"].Value);
-                XmlNode j = xdoc1.ImportNode(i, true);
-                ent.AppendChild(j);
-            }
-
-            // find nodes in doc2 that overlaps with doc1, and merge them in
-
-            doMergeOverlap(xl1, xl2, "/scene/entities", ref xdoc1);
 
             //var nl = xl2.Cast<XmlElement>().Intersect<XmlElement>(xl1.Cast<XmlElement>(), new GameEntityComparitor()).ToList();
 
