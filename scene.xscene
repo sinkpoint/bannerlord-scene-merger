@@ -1,13 +1,74 @@
 <?xml version="1.0"?>
 <scene name="Main_map" version="2">
+  <flora_bounding_rect min="0.000, 0.000" max="0.000, 0.000" />
+  <levels>
+    <level name="base" mask="1" />
+    <level name="level_1" mask="2" />
+    <level name="level_2" mask="4" />
+    <level name="level_3" mask="8" />
+    <level name="civilian" mask="16" />
+    <level name="siege" mask="32" />
+    <level name="looted" mask="64" />
+  </levels>
+  <environment_properties>
+    <property name="nav_mesh_auto_generated_" value="true" />
+    <property name="physics_world_min" value="-973.117, -936.996" />
+    <property name="physics_world_max_" value="848.000, 848.000" />
+    <property name="north_angle" value="0.000" />
+    <property name="is_indoors" value="false" />
+    <property name="disable_flora_billboards" value="false" />
+    <property name="ground_color" value="0.000, 0.000, 0.000" />
+    <property name="prt_multiplier" value="1.000" />
+    <property name="prt_point_light_multiplier" value="1.000" />
+    <property name="fog_start_distance" value="50.000" />
+    <property name="prt_color_contrast" value="1.000" />
+    <property name="scene_scale_multiplier" value="1.000" />
+    <property name="prt_intensity_contrast" value="1.000" />
+    <property name="prt_fallback_probe_index" value="-1, -1, -1" />
+    <property name="enforced_color_grade" value="" />
+    <atmosphere_properties>
+      <property name="atmosphere_name" value="scene_atmosphere" />
+      <property name="wind" value="0.000, 2.000" />
+      <property name="scene_fog_falloff_offset" value="0.000" />
+    </atmosphere_properties>
+    <water_properties version="1">
+      <property name="water_level" value="1.800" />
+      <property name="water_strength" value="5.000" />
+      <property name="water_wind_dependency" value="1.000" />
+      <property name="water_material" value="wat_main_map_ocean_g" />
+      <property name="water_shallow_color" value="0.006, 0.013, 0.006" />
+      <property name="water_deep_color" value="0.000, 0.007, 0.017" />
+      <property name="water_exists" value="true" />
+      <property name="place_water_probe" value="true" />
+    </water_properties>
+    <out_of_bounds_effects_properties>
+      <property name="vignette_color" value="0.000, 0.500, 1.000" />
+      <property name="vignette_alpha" value="0.000" />
+    </out_of_bounds_effects_properties>
+  </environment_properties>
   <entities>
+    <game_entity name="campaign_icon_capsule_missing_children" old_prefab_name="">
+      <transform position="648.397, 319.378, 20.000" rotation_euler="0.000, 0.000, 0.000" />
+      <children>
+        <game_entity name="town_ES5" old_prefab_name="" mobility="1">
+          <transform position="0,0,0" rotation_euler="0.000, 0.000, 0.000" />
+        </game_entity>
+      </children>
+    </game_entity>
+    <game_entity name="campaign_icon_capsule_missing_children_2" old_prefab_name="">
+      <transform position="648.397, 319.378, 20.000" rotation_euler="0.000, 0.000, 0.000" />
+      <children>
+        <game_entity name="town_ES5" old_prefab_name="" mobility="1">
+          <transform position="0,0,0" rotation_euler="0.000, 0.000, 0.000" />
+        </game_entity>
+      </children>
+    </game_entity>
     <game_entity name="campaign_icon_capsule_43" old_prefab_name="">
       <transform position="648.397, 319.378, 20.000" rotation_euler="0.000, 0.000, 0.000" />
       <children>
         <game_entity name="castle_village_ES2_2" old_prefab_name="map_village_emp_all_40" mobility="1">
           <transform position="0,0,0" rotation_euler="0.000, 0.000, 0.000" />
         </game_entity>
-        <game_entity name="castle_village_ADD_IC1" old_prefab_name="map_village_emp_all_40" mobility="1" />
       </children>
     </game_entity>
     <game_entity name="campaign_icon_capsule_1" old_prefab_name="">
@@ -16,13 +77,6 @@
         <game_entity name="town_ES5" old_prefab_name="" mobility="1">
           <transform position="0,0,0" rotation_euler="0.000, 0.000, 0.000" />
         </game_entity>
-        <game_entity name="castle_village_ADD_IC2" old_prefab_name="map_village_emp_all_40" mobility="1" />
-      </children>
-    </game_entity>
-    <game_entity name="campaign_icon_capsule_8100" old_prefab_name="">
-      <transform position="10, 10, 0" rotation_euler="0.000, 0.000, 0.000" />
-      <children>
-        <game_entity name="castle_village_ADD_in_cap" old_prefab_name="map_village_emp_all_40" mobility="1" />
       </children>
     </game_entity>
   </entities>

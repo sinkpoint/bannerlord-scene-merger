@@ -246,7 +246,10 @@ namespace SpSceneMerger
 
                 foreach (XmlNode k in xl1)
                 {
-                    XmlNode i = k.ParentNode.ParentNode;
+                    XmlNode i = k;
+                    if (only_towns) { 
+                        i = k.ParentNode.ParentNode;
+                    }
                     if (i.Attributes != null && i.Attributes["name"] != null)
                     {
                         nameMap.Add(i.Attributes["name"].Value);
@@ -267,7 +270,11 @@ namespace SpSceneMerger
                 ArrayList queue = new ArrayList();
                 foreach (XmlNode k in xl2)
                 {
-                    XmlNode i = k.ParentNode.ParentNode;
+                    XmlNode i = k;
+                    if (only_towns)
+                    {
+                        i = k.ParentNode.ParentNode;
+                    }
                     //if (nodename.StartsWith("campaign_icon_capsule")) {
                     //    continue;
                     //}
@@ -364,6 +371,12 @@ namespace SpSceneMerger
                         Console.WriteLine(ic2.Count);
                         XmlNodeList ic1 = j.SelectNodes("./children/game_entity");
                         Console.WriteLine(ic1.Count);
+                        
+                        if (j.SelectNodes("./children").Count == 0)
+                        {
+                            // there is no children node to append into
+                            j.AppendChild(xdoc1.CreateElement("children"));
+                        }
                         doMergeDifference(ic1, ic2, $"/scene/entities/game_entity[@name='{node_name}']/children", ref xdoc1);
                         doMergeOverlap(ic1, ic2, $"/scene/entities/game_entity[@name='{node_name}']/children", ref xdoc1);
                     }
